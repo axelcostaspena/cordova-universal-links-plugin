@@ -16,6 +16,7 @@ var context;
 var projectRoot;
 var projectName;
 var entitlementsFilePath;
+var BUILD_TYPES = ['Debug', 'Release'];
 
 module.exports = {
   generateAssociatedDomainsEntitlements: generateEntitlements
@@ -32,10 +33,31 @@ module.exports = {
 function generateEntitlements(cordovaContext, pluginPreferences) {
   context = cordovaContext;
 
-  var currentEntitlements = getEntitlementsFileContent();
-  var newEntitlements = injectPreferences(currentEntitlements, pluginPreferences);
+  var files = getEntitlementFiles();
 
-  saveContentToEntitlementsFile(newEntitlements);
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var currentEntitlements = getEntitlementsFileContent(file);
+        var newEntitlements = injectPreferences(currentEntitlements, pluginPreferences);
+
+        saveContentToEntitlementsFile(file, newEntitlements);
+    }
+}
+
+// get the xcode .entitlements and provisioning profile .plist
+function getEntitlementFiles() {
+    var files = [
+        path.join(getProjectRoot(), 'platforms', 'ios', getProjectName(), getProjectName() + '.entitlements'),
+        path.join(getProjectRoot(), 'platforms', 'ios', getProjectName(), 'Resources', getProjectName() + '.entitlements')
+    ];
+
+    for (var i = 0; i < BUILD_TYPES.length; i++) {
+        var buildType = BUILD_TYPES[i];
+        var plist = path.join(getProjectRoot(), 'platforms', 'ios', getProjectName(), 'Entitlements-' + buildType + '.plist');
+        files.push(plist)
+    }
+
+    return files
 }
 
 // endregion
@@ -47,9 +69,8 @@ function generateEntitlements(cordovaContext, pluginPreferences) {
  *
  * @param {Object} content - data to save; JSON object that will be transformed into xml
  */
-function saveContentToEntitlementsFile(content) {
+function saveContentToEntitlementsFile(filePath, content) {
   var plistContent = plist.build(content);
-  var filePath = pathToEntitlementsFile();
 
   // ensure that file exists
   mkpath.sync(path.dirname(filePath));
@@ -63,8 +84,7 @@ function saveContentToEntitlementsFile(content) {
  *
  * @return {String} entitlements file content
  */
-function getEntitlementsFileContent() {
-  var pathToFile = pathToEntitlementsFile();
+function getEntitlementsFileContent(pathToFile) {
   var content;
 
   try {
@@ -134,19 +154,6 @@ function domainsListEntryForHost(host) {
 // endregion
 
 // region Path helper methods
-
-/**
- * Path to entitlements file.
- *
- * @return {String} absolute path to entitlements file
- */
-function pathToEntitlementsFile() {
-  if (entitlementsFilePath === undefined) {
-    entitlementsFilePath = path.join(getProjectRoot(), 'platforms', 'ios', getProjectName(), 'Resources', getProjectName() + '.entitlements');
-  }
-
-  return entitlementsFilePath;
-}
 
 /**
  * Projects root folder path.
