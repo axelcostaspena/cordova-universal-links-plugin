@@ -11,7 +11,7 @@
 
   // injects config.xml preferences into AndroidManifest.xml file.
   function writePreferences (context, preferences) {
-    var pathToManifest = path.join(context.opts.projectRoot, 'platforms', 'android', 'AndroidManifest.xml');
+    var pathToManifest = path.join(context.opts.projectRoot, 'platforms', 'android', 'app', 'src', 'main', 'AndroidManifest.xml');
     var manifest = xmlHelper.readXmlAsJson(pathToManifest);
     var mainActivityIndex = getMainLaunchActivityIndex(manifest['manifest']['application'][0]['activity']);
 
