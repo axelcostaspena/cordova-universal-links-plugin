@@ -2,6 +2,8 @@
   // properties
   'use strict';
   var path = require('path');
+  var xcode = require('xcode');
+
   var xmlHelper = require('../lib/xmlHelper.js');
   var DEFAULT_SCHEME = 'http';
 
@@ -152,7 +154,7 @@
     var projectFiles = context.requireCordovaModule('glob').sync(path.join(projectPath, '*.xcodeproj', 'project.pbxproj'));
     if (projectFiles.length === 0) return;
     var pbxPath = projectFiles[0];
-    var xcodeproj = context.requireCordovaModule('xcode').project(pbxPath);
+    var xcodeproj = xcode.project(pbxPath);
 
     // add hash
     xcodeproj.parseSync();
