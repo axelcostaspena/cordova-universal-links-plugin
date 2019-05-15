@@ -151,7 +151,7 @@
     // get xcodeproj
     var projectRoot = getProjectRoot(context);
     var projectPath = path.join(projectRoot, 'platforms', 'ios');
-    var projectFiles = context.requireCordovaModule('glob').sync(path.join(projectPath, '*.xcodeproj', 'project.pbxproj'));
+    var projectFiles = require('glob').sync(path.join(projectPath, '*.xcodeproj', 'project.pbxproj'));
     if (projectFiles.length === 0) return;
     var pbxPath = projectFiles[0];
     var xcodeproj = xcode.project(pbxPath);
